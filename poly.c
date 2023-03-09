@@ -74,7 +74,7 @@ void poly_decompress(poly *r, const uint8_t a[KYBER_POLYCOMPRESSEDBYTES])
   unsigned int i;
 
 #if (KYBER_POLYCOMPRESSEDBYTES == 128)
-  #pragma HLS PIPELINE II=50
+  #pragma HLS PIPELINE II=25
   for(i=0;i<KYBER_N/2;i++) {
     r->coeffs[2*i+0] = (((uint16_t)(a[0] & 15)*KYBER_Q) + 8) >> 4;
     r->coeffs[2*i+1] = (((uint16_t)(a[0] >> 4)*KYBER_Q) + 8) >> 4;
@@ -87,7 +87,7 @@ void poly_decompress(poly *r, const uint8_t a[KYBER_POLYCOMPRESSEDBYTES])
   uint8_t t[8];
   
 #pragma HLS ARRAY_PARTITION variable=t type=cyclic factor=8
-  #pragma HLS PIPELINE II=50
+  #pragma HLS PIPELINE II=25
   for(i=0;i<KYBER_N/8;i++) {
     t[0] = (a[0] >> 0);
     t[1] = (a[0] >> 5) | (a[1] << 3);
