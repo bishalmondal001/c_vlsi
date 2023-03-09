@@ -24,7 +24,7 @@ void poly_compress(uint8_t r[KYBER_POLYCOMPRESSEDBYTES], poly *a)
 
 #if (KYBER_POLYCOMPRESSEDBYTES == 128)
 #pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=4
-#pragma HLS PIPELINE II=50
+#pragma HLS PIPELINE II=250
   for(i=0;i<KYBER_N/8;i++) {
 #pragma HLS UNROLL
     for(j=0;j<8;j++){
@@ -38,7 +38,7 @@ void poly_compress(uint8_t r[KYBER_POLYCOMPRESSEDBYTES], poly *a)
   }
 #elif (KYBER_POLYCOMPRESSEDBYTES == 160)
 #pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=5
-#pragma HLS PIPELINE II=50
+#pragma HLS PIPELINE II=250
   for(i=0;i<KYBER_N/8;i++) {
 #pragma HLS UNROLL
     for(j=0;j<8;j++){
