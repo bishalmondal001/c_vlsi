@@ -7,3 +7,9 @@
 #### Insane: polyvec_csubq
 #### Insane: poly_csubq
 #### Insane: csubq()
+#### Insane polyvec_ntt
+#### Insane poly_ntt
+#### Insane ntt
+#### Insane poly_reduce 
+#### Insane fqmul
+#### Insane : reduc.c file
