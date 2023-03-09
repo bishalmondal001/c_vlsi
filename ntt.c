@@ -75,7 +75,7 @@ const int16_t zetas_inv[128] = {
 *
 * Returns 16-bit integer congruent to a*b*R^{-1} mod q
 **************************************************/
-static int16_t fqmul(int16_t a, int16_t b) {
+static int16_t fqmul(int16_t a, int16_t b) {//no changes
   return montgomery_reduce((int32_t)a*b);
 }
 
@@ -88,16 +88,18 @@ static int16_t fqmul(int16_t a, int16_t b) {
 * Arguments:   - int16_t r[256]: pointer to input/output vector of elements
 *                                of Zq
 **************************************************/
-void ntt(int16_t r[256]) {
+
+void ntt(int16_t r[256]) {// no more changes required
   unsigned int len, start, j, k;
   int16_t t, zeta;
-
+#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=8
   k = 1;
-  for(len = 128; len >= 2; len >>= 1) {
-#pragma HLS PIPELINE II=50
-    for(start = 0; start < 256; start = j + len) {
-      zeta = zetas[k++];
 
+  for(len = 128; len >= 2; len >>= 1) {
+#pragma HLS UNROLL
+    for(start = 0; start < 256; start = j + len) {
+      zeta = zetas_inv[k++];
+#pragma HLS PIPELINE II=200
       for(j = start; j < start + len; ++j) {
         t = fqmul(zeta, r[j + len]);
         r[j + len] = r[j] - t;
