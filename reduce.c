@@ -15,7 +15,7 @@
 * Returns:     integer in {-q+1,...,q-1} congruent to a * R^-1 modulo q.
 **************************************************/
 int16_t montgomery_reduce(int32_t a)
-{
+{//no change required
   int32_t t;
   int16_t u;
 
@@ -36,7 +36,7 @@ int16_t montgomery_reduce(int32_t a)
 *
 * Returns:     integer in {0,...,q} congruent to a modulo q.
 **************************************************/
-int16_t barrett_reduce(int16_t a) {
+int16_t barrett_reduce(int16_t a) {// no change required
   int16_t t;
   const int16_t v = ((1U << 26) + KYBER_Q/2)/KYBER_Q;
 
@@ -54,7 +54,7 @@ int16_t barrett_reduce(int16_t a) {
 *
 * Returns:     a - q if a >= q, else a
 **************************************************/
-int16_t csubq(int16_t a) {
+int16_t csubq(int16_t a) {//no change
   a -= KYBER_Q;
   a += (a >> 15) & KYBER_Q;
   return a;
