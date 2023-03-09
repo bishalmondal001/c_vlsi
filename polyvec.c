@@ -233,13 +233,11 @@ void polyvec_pointwise_acc_montgomery(poly *r,
 *
 * Arguments:   - poly *r: pointer to input/output polynomial
 **************************************************/
-void poly_reduce(poly *r)
-{// no more updation required
-#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=8
+void polyvec_reduce(polyvec *r)
+{
   unsigned int i;
-#pragma HLS PIPELINE II=200
-  for(i=0;i<KYBER_N;i++)
-    r->coeffs[i] = barrett_reduce(r->coeffs[i]);
+  for(i=0;i<KYBER_K;i++)
+    poly_reduce(&r->vec[i]);
 }
 
 /*************************************************
