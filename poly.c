@@ -251,7 +251,7 @@ void poly_getnoise_eta2(poly *r, const uint8_t seed[KYBER_SYMBYTES], uint8_t non
 * Arguments:   - uint16_t *r: pointer to in/output polynomial
 **************************************************/
 void poly_ntt(poly *r)
-{
+{//no more
   ntt(r->coeffs);
   poly_reduce(r);
 }
@@ -314,12 +314,14 @@ void poly_tomont(poly *r)
 * Arguments:   - poly *r: pointer to input/output polynomial
 **************************************************/
 void poly_reduce(poly *r)
-{
+{//no more changes
+#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=8
   unsigned int i;
-#pragma HLS PIPELINE II=15
+#pragma HLS PIPELINE II=200
   for(i=0;i<KYBER_N;i++)
     r->coeffs[i] = barrett_reduce(r->coeffs[i]);
 }
+
 
 /*************************************************
 * Name:        poly_csubq
