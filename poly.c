@@ -163,7 +163,7 @@ void poly_frombytes(poly *r, const uint8_t a[KYBER_POLYBYTES])
 **************************************************/
 // no more changed required
 void poly_frommsg(poly *r, const uint8_t msg[KYBER_INDCPA_MSGBYTES])
-{
+{//no more changes
   unsigned int i,j;
   int16_t mask;
 
@@ -172,14 +172,13 @@ void poly_frommsg(poly *r, const uint8_t msg[KYBER_INDCPA_MSGBYTES])
 #endif
 
   for(i=0;i<KYBER_N/8;i++) {
-	#pragma HLS PIPELINE II = 5
+#pragma HLS PIPELINE II=5
     for(j=0;j<8;j++) {
       mask = -(int16_t)((msg[i] >> j)&1);
       r->coeffs[8*i+j] = mask & ((KYBER_Q+1)/2);
     }
   }
 }
-
 /*************************************************
 * Name:        poly_tomsg
 *
@@ -189,7 +188,7 @@ void poly_frommsg(poly *r, const uint8_t msg[KYBER_INDCPA_MSGBYTES])
 *              - poly *a:      pointer to input polynomial
 **************************************************/
 void poly_tomsg(uint8_t msg[KYBER_INDCPA_MSGBYTES], poly *a)
-{
+{//no changes
   unsigned int i,j;
   uint16_t t;
 
@@ -197,6 +196,7 @@ void poly_tomsg(uint8_t msg[KYBER_INDCPA_MSGBYTES], poly *a)
 
   for(i=0;i<KYBER_N/8;i++) {
     msg[i] = 0;
+#pragma HLS PIPELINE II=200
     for(j=0;j<8;j++) {
       t = ((((uint16_t)a->coeffs[8*i+j] << 1) + KYBER_Q/2)/KYBER_Q) & 1;
       msg[i] |= t << j;
@@ -281,16 +281,22 @@ void poly_invntt_tomont(poly *r)
 *              - const poly *a: pointer to first input polynomial
 *              - const poly *b: pointer to second input polynomial
 **************************************************/
+
 void poly_basemul_montgomery(poly *r, const poly *a, const poly *b)
-{
+{//no more changes
+#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=6
+#pragma HLS ARRAY_PARTITION variable=a type=cyclic factor=6
+#pragma HLS ARRAY_PARTITION variable=b type=cyclic factor=6
   unsigned int i;
+
   for(i=0;i<KYBER_N/4;i++) {
     basemul(&r->coeffs[4*i], &a->coeffs[4*i], &b->coeffs[4*i], zetas[64+i]);
-    basemul(&r->coeffs[4*i+2], &a->coeffs[4*i+2], &b->coeffs[4*i+2],
-            -zetas[64+i]);
+
+  }
+  for(i=0;i<KYBER_N/4;i++) {
+	basemul(&r->coeffs[4*i+2], &a->coeffs[4*i+2], &b->coeffs[4*i+2],zetas[64+i]);
   }
 }
-
 /*************************************************
 * Name:        poly_tomont
 *
