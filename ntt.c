@@ -119,27 +119,40 @@ void ntt(int16_t r[256]) {// no more changes required
 * Arguments:   - int16_t r[256]: pointer to input/output vector of elements
 *                                of Zq
 **************************************************/
-void invntt(int16_t r[256]) {
-  unsigned int start, len, j, k;
-  int16_t t, zeta;
-
-  k = 0;
-  for(len = 2; len <= 128; len <<= 1) {
-    for(start = 0; start < 256; start = j + len) {
-      zeta = zetas_inv[k++];
-      for(j = start; j < start + len; ++j) {
-        t = r[j];
-        r[j] = barrett_reduce(t + r[j + len]);
-        r[j + len] = t - r[j + len];
-        r[j + len] = fqmul(zeta, r[j + len]);
-      }
-    }
-  }
-
-  for(j = 0; j < 256; ++j)
-    r[j] = fqmul(r[j], zetas_inv[127]);
+void invntt_func1(int16_t r[256]){//no more changes
+	unsigned int start, len,j, k;
+	  int16_t t, zeta;
+#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=8
+	  k = 0;
+	  for(len = 2; len <= 128; len <<= 1) {
+#pragma HLS UNROLL
+	    for(start = 0; start < 256; start = j + len) {
+	      zeta = zetas_inv[k++];
+#pragma HLS PIPELINE II=200
+	      for(j = start; j < start + len; ++j) {
+	        t = r[j];
+	        r[j] = barrett_reduce(t + r[j + len]);
+	        r[j + len] = t - r[j + len];
+	        r[j + len] = fqmul(zeta, r[j + len]);
+	      }
+	    }
+	  }
 }
 
+void invntt_func2(int16_t r[256]){
+	unsigned int j;
+#pragma HLS UNROLL factor=8
+#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=8
+	for(j = 0; j < 256; ++j)
+	    r[j] = fqmul(r[j], zetas_inv[127]);
+}
+
+void invntt(int16_t r[256]) {
+#pragma HLS PIPELINE II=200
+	invntt_func1(r);
+	invntt_func2(r);
+
+}
 /*************************************************
 * Name:        basemul
 *
