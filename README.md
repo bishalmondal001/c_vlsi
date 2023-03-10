@@ -16,3 +16,7 @@
 #### poly_add
 #### poly_sub
 #### poly_frommsg
+#### poly_basemul_montgomery
+#### poly_tomsg
+#### invntt
+#### basemul
