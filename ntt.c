@@ -168,11 +168,17 @@ void basemul(int16_t r[2],
              const int16_t a[2],
              const int16_t b[2],
              int16_t zeta)
-{
-  r[0]  = fqmul(a[1], b[1]);
-  r[0]  = fqmul(r[0], zeta);
-  r[0] += fqmul(a[0], b[0]);
+{//no more changes
 
-  r[1]  = fqmul(a[0], b[1]);
-  r[1] += fqmul(a[1], b[0]);
+	int16_t x,y,z;
+#pragma HLS ARRAY_PARTITION variable=r type=complete
+#pragma HLS ARRAY_PARTITION variable=a type=complete
+#pragma HLS ARRAY_PARTITION variable=b type=complete
+#pragma HLS PIPELINE II=7
+  x=fqmul(a[1], b[1]);
+  y = fqmul(x, zeta);
+  r[0] =y+fqmul(a[0], b[0]);
+
+  z  = fqmul(a[0], b[1]);
+  r[1] =z+fqmul(a[1], b[0]);
 }
