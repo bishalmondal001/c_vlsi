@@ -161,6 +161,7 @@ void poly_frombytes(poly *r, const uint8_t a[KYBER_POLYBYTES])
 * Arguments:   - poly *r:            pointer to output polynomial
 *              - const uint8_t *msg: pointer to input message
 **************************************************/
+// no more changed required
 void poly_frommsg(poly *r, const uint8_t msg[KYBER_INDCPA_MSGBYTES])
 {
   unsigned int i,j;
@@ -171,7 +172,7 @@ void poly_frommsg(poly *r, const uint8_t msg[KYBER_INDCPA_MSGBYTES])
 #endif
 
   for(i=0;i<KYBER_N/8;i++) {
-    #pragma HLS PIPELINE II = 5
+	#pragma HLS PIPELINE II = 5
     for(j=0;j<8;j++) {
       mask = -(int16_t)((msg[i] >> j)&1);
       r->coeffs[8*i+j] = mask & ((KYBER_Q+1)/2);
@@ -350,13 +351,16 @@ void poly_csubq(poly *r)
 *            - const poly *a: pointer to first input polynomial
 *            - const poly *b: pointer to second input polynomial
 **************************************************/
+// no more changes required
 void poly_add(poly *r, const poly *a, const poly *b)
 {
   unsigned int i;
+#pragma HLS PIPELINE II=50
   for(i=0;i<KYBER_N;i++)
+  {
     r->coeffs[i] = a->coeffs[i] + b->coeffs[i];
 }
-
+}
 /*************************************************
 * Name:        poly_sub
 *
@@ -366,9 +370,11 @@ void poly_add(poly *r, const poly *a, const poly *b)
 *            - const poly *a: pointer to first input polynomial
 *            - const poly *b: pointer to second input polynomial
 **************************************************/
+//no more changes required
 void poly_sub(poly *r, const poly *a, const poly *b)
 {
   unsigned int i;
+#pragma HLS PIPELINE II=50
   for(i=0;i<KYBER_N;i++)
     r->coeffs[i] = a->coeffs[i] - b->coeffs[i];
 }
