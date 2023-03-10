@@ -13,3 +13,6 @@
 #### Insane poly_reduce 
 #### Insane fqmul
 #### Insane : reduc.c file
+#### poly_add
+#### poly_sub
+#### poly_frommsg
