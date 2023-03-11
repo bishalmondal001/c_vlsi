@@ -22,6 +22,7 @@
 * Returns the loaded 64-bit unsigned integer
 **************************************************/
 static uint64_t load64(const uint8_t x[8]) {
+#pragma HLS PIPELINE II=5
   unsigned int i;
   uint64_t r = 0;
 
