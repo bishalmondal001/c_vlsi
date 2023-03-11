@@ -26,3 +26,4 @@
 #### InvMixColumns
 #### InvSubBytes
 #### rej_uniform
+#### store64
