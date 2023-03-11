@@ -25,3 +25,4 @@
 #### MixColumns
 #### InvMixColumns
 #### InvSubBytes
+#### rej_uniform
