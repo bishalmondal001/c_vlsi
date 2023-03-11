@@ -20,3 +20,8 @@
 #### poly_tomsg
 #### invntt
 #### basemul
+#### AddRoundKey
+#### SubBytes
+#### MixColumns
+#### InvMixColumns
+#### InvSubBytes
