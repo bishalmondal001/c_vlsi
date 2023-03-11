@@ -25,3 +25,4 @@
 #### MixColumns
 #### InvMixColumns
 #### InvSubBytes
+#### gen_matrix
