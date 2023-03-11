@@ -20,10 +20,7 @@
 #### poly_tomsg
 #### invntt
 #### basemul
-#### AddRoundKey
-#### SubBytes
-#### MixColumns
-#### InvMixColumns
-#### InvSubBytes
 #### rej_uniform
 #### store64
+#### shake123_absorb
+#### load64
