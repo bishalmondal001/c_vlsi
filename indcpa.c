@@ -139,9 +139,10 @@ static unsigned int rej_uniform(int16_t *r,
 {
   unsigned int ctr, pos;
   uint16_t val0, val1;
-
+#pragma HLS ARRAY_PARTITION variable=buf type=cyclic factor=3
   ctr = pos = 0;
   while(ctr < len && pos + 3 <= buflen) {
+#pragma HLS PIPELINE II=50
     val0 = ((buf[pos+0] >> 0) | ((uint16_t)buf[pos+1] << 8)) & 0xFFF;
     val1 = ((buf[pos+1] >> 4) | ((uint16_t)buf[pos+2] << 4)) & 0xFFF;
     pos += 3;
