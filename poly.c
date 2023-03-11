@@ -284,15 +284,17 @@ void poly_invntt_tomont(poly *r)
 
 void poly_basemul_montgomery(poly *r, const poly *a, const poly *b)
 {//no more changes
-#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=6
-#pragma HLS ARRAY_PARTITION variable=a type=cyclic factor=6
-#pragma HLS ARRAY_PARTITION variable=b type=cyclic factor=6
-  unsigned int i;
 
+#pragma HLS ARRAY_PARTITION variable=r->coeffs type=block factor=64
+#pragma HLS ARRAY_PARTITION variable=a->coeffs type=block factor=64
+#pragma HLS ARRAY_PARTITION variable=b->coeffs type=block factor=64
+  unsigned int i;
+#pragma HLS UNROLL factor=8
   for(i=0;i<KYBER_N/4;i++) {
     basemul(&r->coeffs[4*i], &a->coeffs[4*i], &b->coeffs[4*i], zetas[64+i]);
 
   }
+#pragma HLS UNROLL factor=8
   for(i=0;i<KYBER_N/4;i++) {
 	basemul(&r->coeffs[4*i+2], &a->coeffs[4*i+2], &b->coeffs[4*i+2],zetas[64+i]);
   }
@@ -323,7 +325,7 @@ void poly_tomont(poly *r)
 **************************************************/
 void poly_reduce(poly *r)
 {//no more changes
-#pragma HLS ARRAY_PARTITION variable=r type=cyclic factor=8
+#pragma HLS ARRAY_PARTITION variable=r->coeffs type=complete
   unsigned int i;
 #pragma HLS PIPELINE II=200
   for(i=0;i<KYBER_N;i++)
@@ -361,12 +363,16 @@ void poly_csubq(poly *r)
 void poly_add(poly *r, const poly *a, const poly *b)
 {
   unsigned int i;
-#pragma HLS PIPELINE II=50
+#pragma HLS PIPELINE
+#pragma HLS ARRAY_PARTITION variable=a->coeffs type=complete
+#pragma HLS ARRAY_PARTITION variable=b->coeffs type=complete
+#pragma HLS ARRAY_PARTITION variable=r->coeffs type=complete
   for(i=0;i<KYBER_N;i++)
   {
     r->coeffs[i] = a->coeffs[i] + b->coeffs[i];
 }
 }
+
 /*************************************************
 * Name:        poly_sub
 *
