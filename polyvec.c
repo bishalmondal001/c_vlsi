@@ -214,8 +214,9 @@ void polyvec_pointwise_acc_montgomery(poly *r,
 {
   unsigned int i;
   poly t;
-
+#pragma HLS PIPELINE II=200
   poly_basemul_montgomery(r, &a->vec[0], &b->vec[0]);
+//#pragma HLS UNROLL
   for(i=1;i<KYBER_K;i++) {
     poly_basemul_montgomery(&t, &a->vec[i], &b->vec[i]);
     poly_add(r, r, &t);
@@ -223,7 +224,6 @@ void polyvec_pointwise_acc_montgomery(poly *r,
 
   poly_reduce(r);
 }
-
 /*************************************************
 * Name:        polyvec_reduce
 *
