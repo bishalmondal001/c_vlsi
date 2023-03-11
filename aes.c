@@ -149,7 +149,7 @@ static uint8_t getSBoxInvert(uint8_t num)
 #define getSBoxInvert(num) (rsbox[(num)])
 
 // This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states. 
-void KeyExpansion(uint8_t RoundKey[240], const uint8_t Key[20])
+void KeyExpansion(uint8_t RoundKey[240], const uint8_t Key[20]) //no changes
 {
   unsigned i, j, k;
   uint8_t tempa[4]; // Used for the column/row operations
@@ -240,13 +240,16 @@ void AES_ctx_set_iv(struct AES_ctx* ctx, const uint8_t* iv)
 
 // This function adds the round key to state.
 // The round key is added to the state by an XOR function.
-static void AddRoundKey(uint8_t round,state_t* state,uint8_t* RoundKey)
+void AddRoundKey(uint8_t round,state_t* state,uint8_t* RoundKey)
 {
   uint8_t i,j;
+#pragma HLS ARRAY_PARTITION variable=state type=complete
   AddRoundKey_label0:for (i = 0; i < 4; ++i)
   {
+#pragma HLS UNROLL
     AddRoundKey_label1:for (j = 0; j < 4; ++j)
     {
+#pragma HLS UNROLL
       (*state)[i][j] ^= RoundKey[(round * Nb * 4) + (i * Nb) + j];
     }
   }
@@ -254,13 +257,16 @@ static void AddRoundKey(uint8_t round,state_t* state,uint8_t* RoundKey)
 
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
-static void SubBytes(state_t* state)
+void SubBytes(state_t* state)
 {
+#pragma HLS ARRAY_PARTITION variable=state type=complete
   uint8_t i, j;
   for (i = 0; i < 4; ++i)
   {
+#pragma HLS UNROLL
     for (j = 0; j < 4; ++j)
     {
+#pragma HLS UNROLL
       (*state)[j][i] = getSBoxValue((*state)[j][i]);
     }
   }
@@ -303,12 +309,14 @@ static uint8_t xtime(uint8_t x)
 }
 
 // MixColumns function mixes the columns of the state matrix
-static void MixColumns(state_t* state)
+void MixColumns(state_t* state)
 {
   uint8_t i;
   uint8_t Tmp, Tm, t;
+#pragma HLS ARRAY_PARTITION variable=state type=complete
   for (i = 0; i < 4; ++i)
   {  
+#pragma HLS UNROLL
     t   = (*state)[i][0];
     Tmp = (*state)[i][0] ^ (*state)[i][1] ^ (*state)[i][2] ^ (*state)[i][3] ;
     Tm  = (*state)[i][0] ^ (*state)[i][1] ; Tm = xtime(Tm);  (*state)[i][0] ^= Tm ^ Tmp ;
@@ -349,8 +357,10 @@ static void InvMixColumns(state_t* state)
 {
   int i;
   uint8_t a, b, c, d;
+#pragma HLS ARRAY_PARTITION variable=state type=complete
   for (i = 0; i < 4; ++i)
   { 
+#pragma HLS UNROLL
     a = (*state)[i][0];
     b = (*state)[i][1];
     c = (*state)[i][2];
@@ -368,11 +378,14 @@ static void InvMixColumns(state_t* state)
 // state matrix with values in an S-box.
 static void InvSubBytes(state_t* state)
 {
+#pragma HLS ARRAY_PARTITION variable=state type=complete
   uint8_t i, j;
   for (i = 0; i < 4; ++i)
   {
+#pragma HLS UNROLL
     for (j = 0; j < 4; ++j)
     {
+#pragma HLS UNROLL
       (*state)[j][i] = getSBoxInvert((*state)[j][i]);
     }
   }
@@ -408,7 +421,7 @@ static void InvShiftRows(state_t* state)
 #endif // #if (defined(CBC) && CBC == 1) || (defined(ECB) && ECB == 1)
 
 // Cipher is the main function that encrypts the PlainText.
-static void Cipher(state_t* state, uint8_t RoundKey[AES_keyExpSize])
+static void Cipher(state_t* state, uint8_t RoundKey[AES_keyExpSize]) //no changes
 {
   uint8_t round = 0;
 
@@ -435,7 +448,7 @@ static void Cipher(state_t* state, uint8_t RoundKey[AES_keyExpSize])
 
 #if (defined(CBC) && CBC == 1) || (defined(ECB) && ECB == 1)
 static void InvCipher(state_t* state,uint8_t* RoundKey)
-{
+{ //no changes
   uint8_t round = 0;
 
   // Add the First round key to the state before starting the rounds.
@@ -466,14 +479,14 @@ static void InvCipher(state_t* state,uint8_t* RoundKey)
 #if defined(ECB) && (ECB == 1)
 
 
-void AES_ECB_encrypt(struct AES_ctx *ctx, state_t* buf)
+void AES_ECB_encrypt(struct AES_ctx *ctx, state_t* buf) //no changes
 {
   // The next function call encrypts the PlainText with the Key using AES algorithm.
 
   Cipher(buf, ctx->RoundKey);
 }
 
-void AES_ECB_decrypt(struct AES_ctx* ctx, uint8_t* buf)
+void AES_ECB_decrypt(struct AES_ctx* ctx, uint8_t* buf) //no changes
 {
   // The next function call decrypts the PlainText with the Key using AES algorithm.
   InvCipher((state_t*)buf, ctx->RoundKey);
@@ -489,7 +502,7 @@ void AES_ECB_decrypt(struct AES_ctx* ctx, uint8_t* buf)
 #if defined(CBC) && (CBC == 1)
 
 
-static void XorWithIv(uint8_t* buf, uint8_t* Iv)
+static void XorWithIv(uint8_t* buf, uint8_t* Iv) //no changes
 {
   uint8_t i;
   for (i = 0; i < AES_BLOCKLEN; ++i) // The block in AES is always 128bit no matter the key size
@@ -498,7 +511,7 @@ static void XorWithIv(uint8_t* buf, uint8_t* Iv)
   }
 }
 
-void AES_CBC_encrypt_buffer(struct AES_ctx *ctx,uint8_t* buf, uint32_t length)
+void AES_CBC_encrypt_buffer(struct AES_ctx *ctx,uint8_t* buf, uint32_t length) //no changes
 {
   uintptr_t i;
   uint8_t *Iv = ctx->Iv;
@@ -514,7 +527,7 @@ void AES_CBC_encrypt_buffer(struct AES_ctx *ctx,uint8_t* buf, uint32_t length)
   memcpy(ctx->Iv, Iv, AES_BLOCKLEN);
 }
 
-void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf,  uint32_t length)
+void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf,  uint32_t length) //no changes
 {
   uintptr_t i;
   uint8_t storeNextIv[AES_BLOCKLEN];
@@ -536,7 +549,7 @@ void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf,  uint32_t length)
 #if defined(CTR) && (CTR == 1)
 
 /* Symmetrical operation: same function for encrypting as for decrypting. Note any IV/nonce should never be reused with the same key */
-void AES_CTR_xcrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length)
+void AES_CTR_xcrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length) //no changes
 {
   uint8_t buffer[AES_BLOCKLEN];
   
