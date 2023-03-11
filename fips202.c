@@ -409,13 +409,14 @@ static void keccak_squeezeblocks(uint8_t *out,
                                  uint64_t s[25],
                                  unsigned int r)
 {
-#pragma HLS ARRAY_PARTITION variable=s type=cyclic factor=5
+#pragma HLS ARRAY_PARTITION variable=s type=complete
   unsigned int i;
   while(nblocks > 0) {
     KeccakF1600_StatePermute(s);
+//#pragma HLS PIPELINE II=100
     for(i=0;i<r/8;i++)
     {
-#pragma HLS UNROLL factor=5
+#pragma HLS UNROLL
       store64(out + 8*i, s[i]);
     }
     out += r;
@@ -436,6 +437,7 @@ static void keccak_squeezeblocks(uint8_t *out,
 **************************************************/
 void shake128_absorb(keccak_state *state, const uint8_t *in, size_t inlen)
 {
+#pragma HLS PIPELINE II=5
   keccak_absorb(state->s, SHAKE128_RATE, in, inlen, 0x1F);
 }
 
@@ -468,6 +470,7 @@ void shake128_squeezeblocks(uint8_t *out, size_t nblocks, keccak_state *state)
 **************************************************/
 void shake256_absorb(keccak_state *state, const uint8_t *in, size_t inlen)
 {
+
   keccak_absorb(state->s, SHAKE256_RATE, in, inlen, 0x1F);
 }
 
