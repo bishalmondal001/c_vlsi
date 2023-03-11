@@ -42,10 +42,11 @@ static uint64_t load64(const uint8_t x[8]) {
 static void store64(uint8_t x[8], uint64_t u) {
   unsigned int i;
 
-
+#pragma HLS PIPELINE II=50
   for(i=0;i<8;i++)
-
+  {
     x[i] = u >> 8*i;
+  }
 }
 
 /* Keccak round constants */
@@ -408,11 +409,15 @@ static void keccak_squeezeblocks(uint8_t *out,
                                  uint64_t s[25],
                                  unsigned int r)
 {
+#pragma HLS ARRAY_PARTITION variable=s type=cyclic factor=5
   unsigned int i;
   while(nblocks > 0) {
     KeccakF1600_StatePermute(s);
     for(i=0;i<r/8;i++)
+    {
+#pragma HLS UNROLL factor=5
       store64(out + 8*i, s[i]);
+    }
     out += r;
     --nblocks;
   }
