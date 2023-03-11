@@ -23,3 +23,4 @@
 #### rej_uniform
 #### store64
 #### shake123_absorb
+#### load64
